@@ -1,6 +1,18 @@
-# prio3
+# LootGuard Classic
 
-Prio3 - World of Warcraft Classic addon
+LootGuard Classic - Ein World of Warcraft Cataclysm Classic Addon
+
+## Über LootGuard Classic
+
+LootGuard Classic ist eine Weiterentwicklung des ursprünglichen Prio3 Addons, angepasst und optimiert für World of Warcraft Cataclysm Classic. Unser Ziel ist es, ein nahtloses Zusammenspiel zwischen unserem Addon und unserer Website zu gewährleisten, um Raidleitern und Spielern die bestmögliche Erfahrung bei der Lootverteilung zu bieten.
+
+### Wichtige Hinweise:
+
+- Dieses Addon ist ein Fork des ursprünglichen Prio3 Addons, entwickelt von dieck.
+- Wir haben das Addon für Cataclysm Classic 4.4.0 angepasst und werden es kontinuierlich weiterentwickeln.
+- Das Rebranding zu LootGuard Classic erfolgt, um eine engere Integration mit unserer Website zu ermöglichen.
+
+Für Fragen, Feedback oder Unterstützung besuchen Sie bitte unsere Website https://www.lootguard.de.
 
 ## tl;dr
 

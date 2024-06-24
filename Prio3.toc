@@ -1,8 +1,8 @@
-## Interface: 30402
-## Title: Prio3
-## Notes: Loot notification for Priority Loot system. Can use export from Sahne-Team.de website
-## Author: dieck
-## Version: 20230719
+## Interface: 40400
+## Title: LootGuard Classic
+## Notes: Loot notification for Priority Loot system. Forked from Prio3, optimized for Cataclysm Classic. Uses export from https://www.lootguard.de
+## Author: Original: dieck, Updated by: LootGuard Team
+## Version: 4.4.0.1
 ## SavedVariables: Prio3DB
 
 embeds.xml

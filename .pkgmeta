@@ -1,4 +1,4 @@
-package-as: Prio3
+package-as: LootGuardClassic
 
 externals:
   libs/LibStub:

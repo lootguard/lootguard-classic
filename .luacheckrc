@@ -32,6 +32,7 @@ globals = {
 
   -- Prio3
   "Prio3",
+  "LGC"
   "tempty",
   "tprint",
 

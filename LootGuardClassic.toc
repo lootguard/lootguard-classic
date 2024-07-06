@@ -2,7 +2,7 @@
 ## Title: LootGuard Classic
 ## Notes: Loot notification for Priority Loot system. Optimized for Cataclysm Classic. Uses export from https://www.lootguard.de
 ## Author: Original: dieck, Updated by: LootGuard Team
-## Version: 4.4.0.1
+## Version: 1.1.0
 ## SavedVariables: LootGuardClassicDB
 
 embeds.xml

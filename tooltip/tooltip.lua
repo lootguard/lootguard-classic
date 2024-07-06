@@ -7,8 +7,8 @@ end)
 GameTooltip:HookScript("OnTooltipSetItem", function(self)
     if self:IsForbidden() then return end
 
-    if not Prio3.db.profile.enabled then return end
-    if not Prio3.db.profile.showitemtooltip then return end
+    if not LGC.db.profile.enabled then return end
+    if not LGC.db.profile.showitemtooltip then return end
 
     local _, item = self:GetItem()
 
@@ -21,13 +21,13 @@ GameTooltip:HookScript("OnTooltipSetItem", function(self)
     item = TooltipCache[item]
 
     if item then
-        if (Prio3.db.profile.debug) then
+        if (LGC.db.profile.debug) then
             self:AddDoubleLine("Item ID (Prio3 Debug)", format(WHITE_TEXT, item))
         end
 
         local cancatenedUserPrios = {}
 
-        for user, prios in pairs(Prio3.db.profile.priorities) do
+        for user, prios in pairs(LGC.db.profile.priorities) do
             for index, prio in ipairs(prios) do
                 if (prio == item) then
                     if (cancatenedUserPrios[index] == nil or cancatenedUserPrios[index] == "") then

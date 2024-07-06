@@ -1,6 +1,6 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
-function Prio3:createTwoDialogFrame(title, text, onetxt, one, twotxt, two)
+function LGC:createTwoDialogFrame(title, text, onetxt, one, twotxt, two)
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local f = AceGUI:Create("Window")
@@ -12,8 +12,8 @@ function Prio3:createTwoDialogFrame(title, text, onetxt, one, twotxt, two)
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["Prio3Prio3.twodialogframe"] = f.frame
-	tinsert(UISpecialFrames, "Prio3Prio3.twodialogframe")
+	_G["Prio3LGC.twodialogframe"] = f.frame
+	tinsert(UISpecialFrames, "Prio3LGC.twodialogframe")
 
 	local txt = AceGUI:Create("Label")
 	txt:SetText(text)
@@ -40,7 +40,7 @@ function Prio3:createTwoDialogFrame(title, text, onetxt, one, twotxt, two)
 end
 
 
-function Prio3:createThreeDialogFrame(title, text, onetxt, one, twotxt, two, threetxt, three)
+function LGC:createThreeDialogFrame(title, text, onetxt, one, twotxt, two, threetxt, three)
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local f = AceGUI:Create("Window")
@@ -52,8 +52,8 @@ function Prio3:createThreeDialogFrame(title, text, onetxt, one, twotxt, two, thr
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["Prio3Prio3.threedialogframe"] = f.frame
-	tinsert(UISpecialFrames, "Prio3Prio3.threedialogframe")
+	_G["Prio3LGC.threedialogframe"] = f.frame
+	tinsert(UISpecialFrames, "Prio3LGC.threedialogframe")
 
 	local txt = AceGUI:Create("Label")
 	txt:SetText(text)
@@ -89,54 +89,54 @@ function Prio3:createThreeDialogFrame(title, text, onetxt, one, twotxt, two, thr
 end
 
 
-function Prio3:askToDisable(question)
-	Prio3.askframe = nil
+function LGC:askToDisable(question)
+	LGC.askframe = nil
 
 	local yes = function()
-		Prio3.askframe:Hide()
-		Prio3.db.profile.enabled = false
-		Prio3:Print(L["Prio3 addon is currently disabled."])
+		LGC.askframe:Hide()
+		LGC.db.profile.enabled = false
+		LGC:Print(L["Prio3 addon is currently disabled."])
 	end
 
 	local clear = function()
-		Prio3.askframe:Hide()
-		Prio3.db.profile.priorities = {}
-		Prio3:Print(L["No priorities defined."])
+		LGC.askframe:Hide()
+		LGC.db.profile.priorities = {}
+		LGC:Print(L["No priorities defined."])
 	end
 
 	local no = function()
-		Prio3.askframe:Hide()
+		LGC.askframe:Hide()
 		-- do nothing
 	end
 
-	Prio3.askframe = Prio3:createThreeDialogFrame("Disable Addon?", question, L["Disable"], yes, L["Clear priorities"], clear, L["Keep on"], no)
-	Prio3.askframe:Show()
+	LGC.askframe = LGC:createThreeDialogFrame("Disable Addon?", question, L["Disable"], yes, L["Clear priorities"], clear, L["Keep on"], no)
+	LGC.askframe:Show()
 end
 
 
 
-function Prio3:askToAcceptIncomingPriorities(sender, newPriorities, newReceived)
-	Prio3.askIncomingPrioframe = nil
+function LGC:askToAcceptIncomingPriorities(sender, newPriorities, newReceived)
+	LGC.askIncomingPrioframe = nil
 
-	Prio3.askIncomingPrioYesValues = { sender = sender, newPriorities = newPriorities, newReceived = newReceived }
+	LGC.askIncomingPrioYesValues = { sender = sender, newPriorities = newPriorities, newReceived = newReceived }
 	local yes = function()
-		Prio3.askIncomingPrioframe:Hide()
-		Prio3.db.profile.priorities = Prio3.askIncomingPrioYesValues["newPriorities"]
-		Prio3.db.profile.receivedPriorities = Prio3.askIncomingPrioYesValues["newReceived"]
-		Prio3:Print(L["Accepted new priorities sent from sender"](Prio3.askIncomingPrioYesValues["sender"]))
-		local commmsg = { command = "RECEIVED_PRIORITIES", answer = "accepted", addon = Prio3.addon_id, version = Prio3.versionString }
-		Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+		LGC.askIncomingPrioframe:Hide()
+		LGC.db.profile.priorities = LGC.askIncomingPrioYesValues["newPriorities"]
+		LGC.db.profile.receivedPriorities = LGC.askIncomingPrioYesValues["newReceived"]
+		LGC:Print(L["Accepted new priorities sent from sender"](LGC.askIncomingPrioYesValues["sender"]))
+		local commmsg = { command = "RECEIVED_PRIORITIES", answer = "accepted", addon = LGC.addon_id, version = LGC.versionString }
+		LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 	end
 
 	local no = function()
-		Prio3.askIncomingPrioframe:Hide()
+		LGC.askIncomingPrioframe:Hide()
 		-- send my own priorities to superseed the rogue sender
-		local commmsg = { command = "RECEIVED_PRIORITIES", answer = "rejected as Master Looter", addon = Prio3.addon_id, version = Prio3.versionString }
-		Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+		local commmsg = { command = "RECEIVED_PRIORITIES", answer = "rejected as Master Looter", addon = LGC.addon_id, version = LGC.versionString }
+		LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 
-		Prio3:sendPriorities()
+		LGC:sendPriorities()
 	end
-	Prio3.askIncomingPrioframe = Prio3:createTwoDialogFrame(L["Received Priorities"], L["Received new priorities sent from sender, but I am Master Looter"](sender), L["Accept incoming"], yes, L["Reject and keep mine"], no)
-	Prio3.askIncomingPrioframe:Show()
+	LGC.askIncomingPrioframe = LGC:createTwoDialogFrame(L["Received Priorities"], L["Received new priorities sent from sender, but I am Master Looter"](sender), L["Accept incoming"], yes, L["Reject and keep mine"], no)
+	LGC.askIncomingPrioframe:Show()
 
 end

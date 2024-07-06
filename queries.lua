@@ -1,9 +1,9 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
 -- query functions
 
-function Prio3:QueryUser(username, whisperto)
-	local priotab = Prio3.db.profile.priorities[username]
+function LGC:QueryUser(username, whisperto)
+	local priotab = LGC.db.profile.priorities[username]
 
 	if not priotab then
 		SendChatMessage(L["No priorities found for playerOrItem"](username), "WHISPER", nil, whisperto)
@@ -20,13 +20,13 @@ function Prio3:QueryUser(username, whisperto)
 	end
 end
 
-function Prio3:QueryItem(item, whisperto)
+function LGC:QueryItem(item, whisperto)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item)
 	local itemID = select(3, strfind(itemLink, "item:(%d+)"))
 
 	local prios = {}
 
-	for username,userprio in pairs(Prio3.db.profile.priorities) do
+	for username,userprio in pairs(LGC.db.profile.priorities) do
 		for pr,item in pairs(userprio) do
 			if tonumber(item) == tonumber(itemID) then
 				table.insert(prios, username .. " (" .. pr .. ")")
@@ -43,17 +43,17 @@ function Prio3:QueryItem(item, whisperto)
 end
 
 
-function Prio3:CHAT_MSG_WHISPER(event, text, sender)
+function LGC:CHAT_MSG_WHISPER(event, text, sender)
 	-- disabled?
-    if not Prio3.db.profile.enabled then
+    if not LGC.db.profile.enabled then
 	  return
 	end
 
 	-- sender may contain "-REALM"
 	sender = strsplit("-", sender)
 
-	if Prio3.db.profile.queryself and string.upper(text) == "PRIO" then
-		return Prio3:QueryUser(sender, sender)
+	if LGC.db.profile.queryself and string.upper(text) == "PRIO" then
+		return LGC:QueryUser(sender, sender)
 	end
 
 	local cmd, qry = strsplit(" ", text, 2)
@@ -65,19 +65,19 @@ function Prio3:CHAT_MSG_WHISPER(event, text, sender)
 			return string.upper(string.sub(s,1,1)) .. string.lower(string.sub(s,2))
 		end
 
-		if qry and UnitInRaid(qry) and Prio3.db.profile.queryraid then
-			return Prio3:QueryUser(strcamel(qry), sender)
+		if qry and UnitInRaid(qry) and LGC.db.profile.queryraid then
+			return LGC:QueryUser(strcamel(qry), sender)
 		end
 
-		if qry and GetItemInfo(qry) and Prio3.db.profile.queryitems then
-			return Prio3:QueryItem(qry, sender)
+		if qry and GetItemInfo(qry) and LGC.db.profile.queryitems then
+			return LGC:QueryItem(qry, sender)
 		end
 
 	end
 
 	-- not returned yet? See if we are accepting new whispers
-	if Prio3.db.profile.acceptwhisperprios then
-		Prio3:ParseWhisperLine(sender, text)
+	if LGC.db.profile.acceptwhisperprios then
+		LGC:ParseWhisperLine(sender, text)
 	end
 
 end

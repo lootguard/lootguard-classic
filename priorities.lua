@@ -1,9 +1,9 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
 -- import priorities
-function Prio3:SetPriorities(info, value)
+function LGC:SetPriorities(info, value)
 
-	Prio3.db.profile.priorities = {}
+	LGC.db.profile.priorities = {}
 
 	-- possible formats:
 
@@ -38,7 +38,7 @@ function Prio3:SetPriorities(info, value)
 		end
 	end
 
-	Prio3:Debug("using Format Type " .. formatType)
+	LGC:Debug("using Format Type " .. formatType)
 
 	-- parse lines, and handle individually (SetPriority)
 	local lines = { strsplit("\r\n", value) }
@@ -46,38 +46,38 @@ function Prio3:SetPriorities(info, value)
 	for k,line in pairs(lines) do
 
 	    if not (line == nil or strtrim(line) == '') then
-			Prio3:Debug("will set up " .. line)
-			Prio3:SetPriority(info, line, formatType)
+			LGC:Debug("will set up " .. line)
+			LGC:SetPriority(info, line, formatType)
 		else
-			Prio3:Debug("line is empty: " .. line)
+			LGC:Debug("line is empty: " .. line)
 		end
 
 	end
 
 	-- handle TOTC
-	if Prio3.db.profile.translateTOTC then
-		for user, prios in pairs(Prio3.db.profile.priorities) do
+	if LGC.db.profile.translateTOTC then
+		for user, prios in pairs(LGC.db.profile.priorities) do
 			if (not(strfind(user, "2"))) then
-				local newuser,newprios = Prio3:translateTOTC(user, prios[1], prios[2], prios[3])
+				local newuser,newprios = LGC:translateTOTC(user, prios[1], prios[2], prios[3])
 				if (newuser) then
-					Prio3.db.profile.priorities[newuser] = newprios
+					LGC.db.profile.priorities[newuser] = newprios
 				end
 			end
 		end
 	end
 
 	self.db.profile.prioimporttime = time()
-	Prio3:sendPriorities()
+	LGC:sendPriorities()
 
 	-- open window after import, if configured in options
-	if Prio3.db.profile.opentable then
-		Prio3:guiPriorityFrame()
+	if LGC.db.profile.opentable then
+		LGC:guiPriorityFrame()
 	end
 
 end
 
 
-function Prio3:toPriorityId(s)
+function LGC:toPriorityId(s)
 	for id in string.gmatch(s, "%d+") do
 
 		-- there are some items that are rewards from quest items
@@ -137,10 +137,10 @@ function Prio3:toPriorityId(s)
 	end
 end
 
-function Prio3:OutputUserPrio(user, channel)
+function LGC:OutputUserPrio(user, channel)
 	local itemLinks =  {}
 
-	local p1, p2, p3 = unpack(Prio3.db.profile.priorities[user])
+	local p1, p2, p3 = unpack(LGC.db.profile.priorities[user])
 
 	local _, itemLink1 = GetItemInfo(p1)
 
@@ -165,63 +165,63 @@ function Prio3:OutputUserPrio(user, channel)
 	else
 
 		local t = {
-			needed_itemids = Prio3.db.profile.priorities[user],
+			needed_itemids = LGC.db.profile.priorities[user],
 			vars = { u = user },
 			todo = function(itemlinks,vars)
 				SendChatMessage(L["Priorities of username: list"](vars["u"],table.concat(itemlinks,", ")), channel, nil, vars["u"])
 			end,
 		}
-		table.insert(Prio3.GET_ITEM_INFO_RECEIVED_TodoList, t)
+		table.insert(LGC.GET_ITEM_INFO_RECEIVED_TodoList, t)
 
 	end
 
 end
 
-function Prio3:HandleNewPriorities(user, prio1, prio2, prio3, origin)
+function LGC:HandleNewPriorities(user, prio1, prio2, prio3, origin)
 	-- avoid Priorities being nil, if not all are used up
 	local p1 = 0
 	local p2 = 0
 	local p3 = 0
 
 	if user == nil then
-		Prio3:Debug("No user found in " .. origin)
+		LGC:Debug("No user found in " .. origin)
 	else
 		user = strtrim(user)
 
 		if prio1 == nil then
-			Prio3:Debug("No prio1 found in " .. origin)
+			LGC:Debug("No prio1 found in " .. origin)
 		else
-			p1 = Prio3:toPriorityId(prio1)
-			Prio3:Debug("Found PRIORITY 1 ITEM " .. p1 .. " for user " .. user .. " in " .. origin)
+			p1 = LGC:toPriorityId(prio1)
+			LGC:Debug("Found PRIORITY 1 ITEM " .. p1 .. " for user " .. user .. " in " .. origin)
 		end
 		if prio2 == nil then
-			Prio3:Debug("No prio2 found in " .. origin)
+			LGC:Debug("No prio2 found in " .. origin)
 		else
-			p2 = Prio3:toPriorityId(prio2)
-			Prio3:Debug("Found PRIORITY 2 ITEM " .. p2 .. " for user " .. user .. " in " .. origin)
+			p2 = LGC:toPriorityId(prio2)
+			LGC:Debug("Found PRIORITY 2 ITEM " .. p2 .. " for user " .. user .. " in " .. origin)
 		end
 		if prio3 == nil then
-			Prio3:Debug("No prio3 found in " .. origin)
+			LGC:Debug("No prio3 found in " .. origin)
 		else
-			p3 = Prio3:toPriorityId(prio3)
-			Prio3:Debug("Found PRIORITY 3 ITEM " .. p3 .. " for user " .. user .. " in " .. origin)
+			p3 = LGC:toPriorityId(prio3)
+			LGC:Debug("Found PRIORITY 3 ITEM " .. p3 .. " for user " .. user .. " in " .. origin)
 		end
 
-		if Prio3.db.profile.priorities[user] == nil then 	-- user does not exist
-			Prio3.db.profile.priorities[user] = {p1, p2, p3}
+		if LGC.db.profile.priorities[user] == nil then 	-- user does not exist
+			LGC.db.profile.priorities[user] = {p1, p2, p3}
 		else 												-- user exists
-			Prio3:Debug("User already exists " .. origin)
+			LGC:Debug("User already exists " .. origin)
 			if p1 == 0 and p2 == 0 and p3 == 0 then 		-- check for triple 0 prios
-				Prio3:Debug("No valid prios found in " .. origin)
+				LGC:Debug("No valid prios found in " .. origin)
 			else
-				Prio3:Debug("Overwrite existing prio " .. origin)
-				Prio3.db.profile.priorities[user] = {p1, p2, p3}
+				LGC:Debug("Overwrite existing prio " .. origin)
+				LGC.db.profile.priorities[user] = {p1, p2, p3}
 			end
 		end
 
 		-- whisper if player is in RAID, oder in debug mode to player char
-		if Prio3.db.profile.whisperimport and ((Prio3.db.profile.debug and user == UnitName("player")) or UnitInRaid(user)) then
-			Prio3:OutputUserPrio(user, "WHISPER")
+		if LGC.db.profile.whisperimport and ((LGC.db.profile.debug and user == UnitName("player")) or UnitInRaid(user)) then
+			LGC:OutputUserPrio(user, "WHISPER")
 		end
 
 	end
@@ -229,7 +229,7 @@ function Prio3:HandleNewPriorities(user, prio1, prio2, prio3, origin)
 end
 
 -- parse incoming priorities
-function Prio3:SetPriority(info, line, formatType)
+function LGC:SetPriority(info, line, formatType)
 	local user, prio1, prio2, prio3, dummy
 
 	if formatType == "CSV-SHORT" then
@@ -250,15 +250,15 @@ function Prio3:SetPriority(info, line, formatType)
 		user, dummy, prio1, prio2, prio3 = strsplit("&", linecsv)
 	end
 
-	Prio3:HandleNewPriorities(user, prio1, prio2, prio3, line)
+	LGC:HandleNewPriorities(user, prio1, prio2, prio3, line)
 
 end
 
 
-function Prio3:ParseWhisperLine(sender, line)
+function LGC:ParseWhisperLine(sender, line)
 	-- check if we would accept from this user anyway
-	if Prio3.db.profile.acceptwhisperprios_new then
-		if Prio3.db.profile.priorities[sender] ~= nil then
+	if LGC.db.profile.acceptwhisperprios_new then
+		if LGC.db.profile.priorities[sender] ~= nil then
 			-- prios already set for this user, and not accepting overwrites
 			return nil
 		end
@@ -273,37 +273,37 @@ function Prio3:ParseWhisperLine(sender, line)
 	-- nesting matches for 2 and 3 doesn't seem to work properly, so taking the long road
 
 	local p1, p2, p3 = line:match("|Hitem:(%d+):.-|Hitem:(%d+):.-|Hitem:(%d+):")
-	if (p3 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, p2, p3, line) end
+	if (p3 ~= nil) then return LGC:HandleNewPriorities(sender, p1, p2, p3, line) end
 
 	p1, p2 = line:match("|Hitem:(%d+):.-|Hitem:(%d+):")
-	if (p2 ~= nil) then	return Prio3:HandleNewPriorities(sender, p1, p2, nil, line) end
+	if (p2 ~= nil) then	return LGC:HandleNewPriorities(sender, p1, p2, nil, line) end
 
 	p1 = line:match("|Hitem:(%d+):")
-	if (p1 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, nil, nil, line) end
+	if (p1 ~= nil) then return LGC:HandleNewPriorities(sender, p1, nil, nil, line) end
 
 	-- ok, no itemlink. Let's look for wowhead links
 	-- should look like https://classic.wowhead.com/item=19351/maladath-runed-blade-of-the-black-flight or https://de.classic.wowhead.com/item=2482/minderwertiger-tomahawk
 	-- same as above, nested matching seems not to work properly
 
 	p1, p2, p3 = line:match("item=(%d+).-item=(%d+).-item=(%d+)")
-	if (p3 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, p2, p3, line) end
+	if (p3 ~= nil) then return LGC:HandleNewPriorities(sender, p1, p2, p3, line) end
 
 	p1, p2 = line:match("item=(%d+).-item=(%d+)")
-	if (p2 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, p2, nil, line) end
+	if (p2 ~= nil) then return LGC:HandleNewPriorities(sender, p1, p2, nil, line) end
 
 	p1 = line:match("item=(%d+)")
-	if (p1 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, nil, nil, line) end
+	if (p1 ~= nil) then return LGC:HandleNewPriorities(sender, p1, nil, nil, line) end
 
 	-- finally, look if we find 3 numbers that look feasible
 
 	p1, p2, p3 = line:match("(%d+).-(%d+).-(%d+)")
-	if (p3 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, p2, p3, line) end
+	if (p3 ~= nil) then return LGC:HandleNewPriorities(sender, p1, p2, p3, line) end
 
 	p1, p2 = line:match("(%d+).-(%d+)")
-	if (p2 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, p2, nil, line) end
+	if (p2 ~= nil) then return LGC:HandleNewPriorities(sender, p1, p2, nil, line) end
 
 	p1 = line:match("(%d+)")
-	if (p1 ~= nil) then return Prio3:HandleNewPriorities(sender, p1, nil, nil, line) end
+	if (p1 ~= nil) then return LGC:HandleNewPriorities(sender, p1, nil, nil, line) end
 
 end
 

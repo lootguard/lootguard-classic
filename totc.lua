@@ -560,8 +560,8 @@ totcTranslation["n47656"] = 47637
 totcTranslation["n47657"] = 47636
 
 
-function Prio3:importAtlasLootTOTC()
-	if Prio3.alreadyImportedAtlasLootTOTC then return nil end
+function LGC:importAtlasLootTOTC()
+	if LGC.alreadyImportedAtlasLootTOTC then return nil end
 
 	if (not _G["AtlasLoot"]) then return nil end
 	if (not _G["AtlasLoot"].ItemDB) then return nil end
@@ -570,7 +570,7 @@ function Prio3:importAtlasLootTOTC()
 	if (not _G["AtlasLoot"].ItemDB["Storage"]["AtlasLootClassic_DungeonsAndRaids"]["TrialoftheCrusader"]) then return nil end
 	if (not _G["AtlasLoot"].ItemDB["Storage"]["AtlasLootClassic_DungeonsAndRaids"]["TrialoftheCrusader"]["items"]) then return nil end
 
-	Prio3.AtlasLootItemIdsTOTC = {}
+	LGC.AtlasLootItemIdsTOTC = {}
 
 	for dummy1,v1 in pairs(_G["AtlasLoot"].ItemDB["Storage"]["AtlasLootClassic_DungeonsAndRaids"]["TrialoftheCrusader"]["items"]) do
 		if type(v1) == "table" then for dummy2,v2 in pairs(v1) do
@@ -579,18 +579,18 @@ function Prio3:importAtlasLootTOTC()
 				local itemId = tonumber(v3[2])
 				-- filter out tier sets
 				if ((itemId) and (itemId < 3000000) and (itemId > 100)) then
-					Prio3.AtlasLootItemIdsTOTC[itemId] = true
+					LGC.AtlasLootItemIdsTOTC[itemId] = true
 				end
 			end end
 		end end
 	end
 
-	Prio3.alreadyImportedAtlasLootTOTC = true
-	Prio3:parseAtlasLootTOTC()
+	LGC.alreadyImportedAtlasLootTOTC = true
+	LGC:parseAtlasLootTOTC()
 end
 
-function Prio3:parseAtlasLootTOTC()
-	Prio3:Debug("parseAtlasLootTOTC start parsing")
+function LGC:parseAtlasLootTOTC()
+	LGC:Debug("parseAtlasLootTOTC start parsing")
 	-- see if we might already have all data
 	local haveAll = true
 	local missing = {}
@@ -598,7 +598,7 @@ function Prio3:parseAtlasLootTOTC()
 	local allItems = {}
 
     -- look through all items ids (but only once)
-	for itemid,_ in pairs(Prio3.AtlasLootItemIdsTOTC) do
+	for itemid,_ in pairs(LGC.AtlasLootItemIdsTOTC) do
 		if tonumber(itemid) > 0 then
 			local itemname, itemlink = GetItemInfo(itemid)
 			if itemlink == nil then
@@ -613,7 +613,7 @@ function Prio3:parseAtlasLootTOTC()
 
 	if haveAll then
 
-		Prio3:Debug("parseAtlasLootTOTC found all, now search for matching")
+		LGC:Debug("parseAtlasLootTOTC found all, now search for matching")
 
 		local byName = {}
 
@@ -630,41 +630,41 @@ function Prio3:parseAtlasLootTOTC()
 
 		end
 
-		Prio3.AtlasLootFullyLoaded = true
-		Prio3:Print("Atlas Loot imported and parsed for Prio3 TOTC HC+NHC recognition.")
+		LGC.AtlasLootFullyLoaded = true
+		LGC:Print("Atlas Loot imported and parsed for Prio3 TOTC HC+NHC recognition.")
 
 	else
-		if Prio3.db.profile.debug then Prio3:Print("DEBUG: requested window to open after GET_ITEM_INFO_RECEIVED") end
+		if LGC.db.profile.debug then LGC:Print("DEBUG: requested window to open after GET_ITEM_INFO_RECEIVED") end
 		-- queue for handling when GET_ITEM_INFO_RECEIVED event came through
 
 		-- k,v transform missing to needed
 		local needed = {}
 		for itemid,dummy in pairs(missing) do tinsert(needed,itemid) end
 
-		Prio3:Debug("parseAtlasLootTOTC missing some information on " .. table.concat(needed, "; "))
+		LGC:Debug("parseAtlasLootTOTC missing some information on " .. table.concat(needed, "; "))
 
 		local t = {
 			needed_itemids = needed,
 			vars = {},
 			todo = function(itemlinks,vars)
-				Prio3:parseAtlasLootTOTC()
+				LGC:parseAtlasLootTOTC()
 			end,
 		}
-		table.insert(Prio3.GET_ITEM_INFO_RECEIVED_TodoList, t)
+		table.insert(LGC.GET_ITEM_INFO_RECEIVED_TodoList, t)
 	end
 
-	Prio3:Debug("parseAtlasLootTOTC stopped parsing AtlasLoot")
+	LGC:Debug("parseAtlasLootTOTC stopped parsing AtlasLoot")
 
 end
 
-function Prio3:translateTOTC(player, itemIdA, itemIdB, itemIdC)
+function LGC:translateTOTC(player, itemIdA, itemIdB, itemIdC)
 	-- look into nhc items, if an hc item exist
 	local function translateSingle(itemId)
 
 		-- if nothing came in, then nothing will go out
 		if itemId == nil then return nil end
 
-		if (Prio3.AtlasLootFullyLoaded) then
+		if (LGC.AtlasLootFullyLoaded) then
 			-- look into AtlasLoot items, if another item exist
 			-- if this exists, should have priority over self-parsed lists
 			local alItem = totcTranslation["a" .. tostring(itemId)]

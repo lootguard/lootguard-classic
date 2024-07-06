@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("Prio3", "deDE", false)
+local L = LibStub("AceLocale-3.0"):NewLocale("LootGuardClassic", "deDE", false)
 
 if L then
 
@@ -98,7 +98,7 @@ L["End accepting"] = "Beende Flüstern"
 L["Prio3 addon is currently disabled."] = "Prio3-Addon ist zur Zeit deaktiviert."
 
 L["Congratulations on finishing the Raid!"] = "Herzlichen Glückwunsch zum Abschluss des Raids!"
-L["Thank you for using Prio3."] = "Danke dass ihr das Prio3-Addon nutzt."
+L["Thank you for using LGC."] = "Danke dass ihr das Prio3-Addon nutzt."
 L["If you like it, Allaister on EU-Everlook (Alliance) is gladly taking donations!"] = "Wenn es euch gefällt, Allaister auf EU-Everlook (Allianz) nimmt gerne Spenden an!"
 
 -- used terms from core.lua
@@ -122,7 +122,7 @@ L["Priority List"] = "Prioritäts-Liste"
 
 
 -- help texts from gui.lua
-L["Prio3 Help"] = "Prio3 Hilfe"
+L["Prio3 Help"] = "LootGuard Hilfe"
 L["tl;dr"] = "tl;dr"
 L["Prio3 System"] = "Prio3-System"
 L["Manual"] = "Handbuch"
@@ -205,7 +205,7 @@ L["You could opt for accepting priorities by whisper. Go to Menu Interfaces, Tab
 L["OUTPUT, or What happens when loot drops"] = "AUSGABEN, oder Was passiert wenn Gegenstände gefunden werden?"
 
 L["You can choose the output language independent of your client languague. Currently only English and German are supported. If you are interested in helping out with another translation, please let me know on http://github.com/dieck/prio3"] = "Man kann die Ausgabesprache unabhängig von der Sprache von WoW festlegen. Aktuell gibt es nur Englisch und Deutsch. Falls du Prio3 in eine andere Sprache übersetzen willst, kontaktiere mich einfach über http://github.com/dieck/prio3"
-L["Announcing to Raid is the main functionality. It will post to raid when it encounters loot where someone has a priority on. It will post one line per Priority (1,2,3), with the chars who have listed it."] = "Raid benachrichtigen ist die Haupt-Funktionalität von Prio3. Gefallenene Gegenstände werden an den Raid geschrieben wenn jemand eine Priorität darauf hat. Es wird eine Zeile pro Priorität (1,2,3) ausgegeben, mit allen Spielern die entsprechend gewählt haben."
+L["Announcing to Raid is the main functionality. It will post to raid when it encounters loot where someone has a priority on. It will post one line per Priority (1,2,3), with the chars who have listed it."] = "Raid benachrichtigen ist die Haupt-Funktionalität von LGC. Gefallenene Gegenstände werden an den Raid geschrieben wenn jemand eine Priorität darauf hat. Es wird eine Zeile pro Priorität (1,2,3) ausgegeben, mit allen Spielern die entsprechend gewählt haben."
 L["You can also announce if there is No Priority set up for an item."] = "Man kann auch über Gegenstände benachrichtigt werden, für die es keine Priorität gibt."
 L["Announces will react to the minimum quality setting. Recommendation: Epic for most raids, Rare for AQ20"] = "Benachrichtigungen können auf eine Mindestqualität gesetzt werden. Empfehlung: Episch für die meisten Raids, Rar für AQ20"
 L["You can also whisper to players if there is loot that they have chosen."] = "Man kann den Spielern auch zuflüstern lassen, wenn Gegenstände gefallen sind, die sie gewählt haben."
@@ -240,7 +240,7 @@ L["Until now, all addon synchronisation features were backwards compatible. If t
 
 
 -- load default outputs
-for k,v in pairs(Prio3.outputLocales["deDE"]) do L[k] = v end
+for k,v in pairs(LGC.outputLocales["deDE"]) do L[k] = v end
 
 
 end

@@ -32,4 +32,4 @@ L["Only accepting whispers from players who have not yet set a priority."] = "Es
 L["No longer accepting Prio3 updates by whisper."] = "Es werden keine keine geflüsterten Prioritäten mehr angenommen."
 
 
-Prio3.outputLocales["deDE"] = L
+LGC.outputLocales["deDE"] = L

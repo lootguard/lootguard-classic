@@ -33,4 +33,4 @@ L["No longer accepting Prio3 updates by whisper."] = "No longer accepting Prio3 
 
 
 
-Prio3.outputLocales["enUS"] = L
+LGC.outputLocales["enUS"] = L

@@ -1,20 +1,19 @@
 ## Interface: 40400
 ## Title: LootGuard Classic
-## Notes: Loot notification for Priority Loot system. Forked from Prio3, optimized for Cataclysm Classic. Uses export from https://www.lootguard.de
+## Notes: Loot notification for Priority Loot system. Optimized for Cataclysm Classic. Uses export from https://www.lootguard.de
 ## Author: Original: dieck, Updated by: LootGuard Team
 ## Version: 4.4.0.1
-## SavedVariables: Prio3DB
+## SavedVariables: LootGuardClassicDB
 
 embeds.xml
 
-prio3.lua
+lootguard_classic.lua
 
 output-enUS.lua
 locale-enUS.lua
 
 output-deDE.lua
 locale-deDE.lua
-
 
 iteminfo.lua
 priorities.lua
@@ -27,4 +26,3 @@ tooltip/tooltip.lua
 totc.lua
 
 core.lua
-

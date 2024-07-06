@@ -1,29 +1,29 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
-Prio3.lootframe = nil
+LGC.lootframe = nil
 
-function Prio3:handleChatCommand(cmd)
+function LGC:handleChatCommand(cmd)
 
 	if cmd == "config" then
-		if Prio3.lootframe ~= nil then
-			Prio3.lootframe:Hide()
+		if LGC.lootframe ~= nil then
+			LGC.lootframe:Hide()
 		end
-		LibStub("AceConfigDialog-3.0"):Open("Prio3")
+		LibStub("AceConfigDialog-3.0"):Open("LootGuardClassic")
 
 	elseif (cmd == "help") or (tempty(self.db.profile.priorities)) then
-		Prio3:guiHelpFrame()
+		LGC:guiHelpFrame()
 
 	else
-		Prio3:guiPriorityFrame()
+		LGC:guiPriorityFrame()
 
 	end
 end
 
-function Prio3:guiPriorityFrame()
+function LGC:guiPriorityFrame()
 
---	if not Prio3.lootframe == nil then
---	  Prio3.lootframe:Hide()
---	  Prio3.lootframe = nil
+--	if not LGC.lootframe == nil then
+--	  LGC.lootframe:Hide()
+--	  LGC.lootframe = nil
 --	  return
 --	end
 
@@ -46,34 +46,34 @@ function Prio3:guiPriorityFrame()
 	end
 
 	if haveAll then
-		Prio3.lootframe = Prio3:createPriorityFrame()
-		Prio3.lootframe:Show()
+		LGC.lootframe = LGC:createPriorityFrame()
+		LGC.lootframe:Show()
 	else
-		if Prio3.db.profile.debug then Prio3:Print("DEBUG: requested window to open after GET_ITEM_INFO_RECEIVED") end
+		if LGC.db.profile.debug then LGC:Print("DEBUG: requested window to open after GET_ITEM_INFO_RECEIVED") end
 		-- queue for handling when GET_ITEM_INFO_RECEIVED event came through
 		local t = {
 			needed_itemids = tblrequest,
 			vars = {},
 			todo = function(itemlinks,vars)
-				Prio3.lootframe = Prio3:createPriorityFrame()
-				Prio3.lootframe:Show()
+				LGC.lootframe = LGC:createPriorityFrame()
+				LGC.lootframe:Show()
 			end,
 		}
-		table.insert(Prio3.GET_ITEM_INFO_RECEIVED_TodoList, t)
+		table.insert(LGC.GET_ITEM_INFO_RECEIVED_TodoList, t)
 	end
 
 end
 
-function Prio3:createPriorityFrame()
+function LGC:createPriorityFrame()
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	if self.db.profile.priorities == nil then
-		Prio3:Print(L["No priorities defined."])
+		LGC:Print(L["No priorities defined."])
 		return;
 	end
 
 	local f = AceGUI:Create("Window")
-	f:SetTitle(L["Priority List"] .. " " .. strsub(Prio3.versionString, 1, 9))
+	f:SetTitle(L["Priority List"] .. " " .. strsub(LGC.versionString, 1, 9))
 	f:SetStatusText("")
 	f:SetLayout("Flow")
 	f:SetWidth(700)
@@ -81,15 +81,15 @@ function Prio3:createPriorityFrame()
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["Prio3.lootframeFrame"] = f.frame
-	tinsert(UISpecialFrames, "Prio3.lootframeFrame")
+	_G["LGC.lootframeFrame"] = f.frame
+	tinsert(UISpecialFrames, "LGC.lootframeFrame")
 
 	local btCfg = AceGUI:Create("Button")
 	btCfg:SetText("Config / Import")
 	btCfg:SetRelativeWidth(0.5)
 	btCfg:SetCallback("OnClick", function()
-		Prio3.lootframe:Hide()
-		LibStub("AceConfigDialog-3.0"):Open("Prio3")
+		LGC.lootframe:Hide()
+		LibStub("AceConfigDialog-3.0"):Open("LootGuardClassic")
 	end)
 	f:AddChild(btCfg)
 
@@ -97,8 +97,8 @@ function Prio3:createPriorityFrame()
 	btHelp:SetText("Help")
 	btHelp:SetRelativeWidth(0.5)
 	btHelp:SetCallback("OnClick", function()
-		Prio3.lootframe:Hide()
-		Prio3:guiHelpFrame()
+		LGC.lootframe:Hide()
+		LGC:guiHelpFrame()
 	end)
 	f:AddChild(btHelp)
 
@@ -133,7 +133,7 @@ function Prio3:createPriorityFrame()
 				s:AddChild(lbIcon)
 
 				local lbPrio = AceGUI:Create("InteractiveLabel")
-				if (Prio3.db.profile.debug) then
+				if (LGC.db.profile.debug) then
 					lbPrio:SetText("("..prios[prioNumber]..") " .. itemLink)
 				else
 					lbPrio:SetText(itemLink)
@@ -200,24 +200,24 @@ function Prio3:createPriorityFrame()
 end
 
 
-function Prio3:guiHelpFrame()
-	if Prio3.helpframe == nil then
-		Prio3.helpframe = Prio3:createHelpFrame()
-		Prio3.helpframe:Hide()
+function LGC:guiHelpFrame()
+	if LGC.helpframe == nil then
+		LGC.helpframe = LGC:createHelpFrame()
+		LGC.helpframe:Hide()
 	end
-	if Prio3.helpframe:IsShown() then
-		Prio3.helpframe:Hide()
+	if LGC.helpframe:IsShown() then
+		LGC.helpframe:Hide()
 	else
-		Prio3.helpframe:Show()
+		LGC.helpframe:Show()
 	end
 end
 
 
-function Prio3:createHelpFrame()
+function LGC:createHelpFrame()
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local f = AceGUI:Create("Window")
-	f:SetTitle(L["Prio3 Help"] .. " " .. strsub(Prio3.versionString, 1, 9))
+	f:SetTitle(L["Prio3 Help"] .. " " .. strsub(LGC.versionString, 1, 9))
 	f:SetStatusText("")
 	f:SetLayout("Flow")
 	f:SetWidth(700)
@@ -227,15 +227,15 @@ function Prio3:createHelpFrame()
 -- do not release!	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["Prio3.helpframeFrame"] = f.frame
-	tinsert(UISpecialFrames, "Prio3.helpframeFrame")
+	_G["LGC.helpframeFrame"] = f.frame
+	tinsert(UISpecialFrames, "LGC.helpframeFrame")
 
 	local btCfg = AceGUI:Create("Button")
 	btCfg:SetText("Config / Import")
 	btCfg:SetRelativeWidth(0.5)
 	btCfg:SetCallback("OnClick", function()
-		Prio3.helpframe:Hide()
-		LibStub("AceConfigDialog-3.0"):Open("Prio3")
+		LGC.helpframe:Hide()
+		LibStub("AceConfigDialog-3.0"):Open("LootGuardClassic")
 	end)
 	f:AddChild(btCfg)
 
@@ -243,8 +243,8 @@ function Prio3:createHelpFrame()
 	btPrio:SetText(L["Priority List"])
 	btPrio:SetRelativeWidth(0.5)
 	btPrio:SetCallback("OnClick", function()
-		Prio3.helpframe:Hide()
-		Prio3:guiPriorityFrame()
+		LGC.helpframe:Hide()
+		LGC:guiPriorityFrame()
 	end)
 	f:AddChild(btPrio)
 
@@ -255,10 +255,10 @@ function Prio3:createHelpFrame()
 	tabGroup:SetLayout("Fill")
 	tabGroup:SetTabs({
 		{ value = "tl;dr", text = L["tl;dr"] },
-		{ value = "prio3", text = L["Prio3 System"] },
+		{ value = "LootGuardClassic", text = L["Prio3 System"] },
 		{ value = "manual", text = L["Manual"] },
 	})
-	tabGroup:SetCallback("OnGroupSelected", function(widget, event, group) Prio3:HelpFrameTabChange(widget, event, group) end)
+	tabGroup:SetCallback("OnGroupSelected", function(widget, event, group) LGC:HelpFrameTabChange(widget, event, group) end)
 	tabGroup:SelectTab("tl;dr")
 
 	f:AddChild(tabGroup)
@@ -266,19 +266,19 @@ function Prio3:createHelpFrame()
 	return f
 end
 
-function Prio3:HelpFrameTabChange(container, event, group)
+function LGC:HelpFrameTabChange(container, event, group)
     container:ReleaseChildren()
 
     if group == "tl;dr" then
-		Prio3:HelpFrameTab_tldr(container)
-    elseif group == "prio3" then
-		Prio3:HelpFrameTab_prio3(container)
+		LGC:HelpFrameTab_tldr(container)
+    elseif group == "LootGuardClassic" then
+		LGC:HelpFrameTab_prio3(container)
     elseif group == "manual" then
-		Prio3:HelpFrameTab_manual(container)
+		LGC:HelpFrameTab_manual(container)
     end
 end
 
-function Prio3:HelpFrameTab_tldr(container)
+function LGC:HelpFrameTab_tldr(container)
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local s = AceGUI:Create("ScrollFrame")
@@ -307,13 +307,13 @@ function Prio3:HelpFrameTab_tldr(container)
 	s:AddChild(sgig)
 
 	heading(sgig, L["tl;dr In-Game"])
-	label(sgig, L["Go to /prio3 config, Import, Accept whispers"])
+	label(sgig, L["Go to /lgc or /lootguard config, Import, Accept whispers"])
 	label(sgig, L["For initial round, turn *off* Accept only new"])
 	label(sgig, L["Start accepting whispers"])
-	label(sgig, L["You can verify who answered by /prio3"])
+	label(sgig, L["You can verify who answered by /lgc or /lootguard"])
 	label(sgig, L["End accepting whispers if all players entered"])
 	label(sgig, L["For late joiners, re-enable Accept only new before allowing whispers"])
-	label(sgig, L["Participants will need to have the Prio3 addon to see current list."])
+	label(sgig, L["Participants will need to have the LootGuard Classic addon to see current list."])
 	label(sgig, L["If enabled in config, Participants can use whisper queries to find out who else has their items on prio."])
 
 	local sgde = AceGUI:Create("InlineGroup")
@@ -321,14 +321,14 @@ function Prio3:HelpFrameTab_tldr(container)
 	s:AddChild(sgde)
 
 	heading(sgde, L["tl;dr German users"])
-	label(sgde, L["I really encourage you to use sahne-team.de!"])
-	label(sgde, L["Top left: Priorun, Priorun Erstellen, chose Server, Char and Class."])
-	label(sgde, L["*Note down the Admin Pin to the top right for yourself, if you get disconnected*."])
-	label(sgde, L["Go to Raid Ziel, choose instance. Announce Prio PIN from Regeln or Spieler tab to participants (not Admin Pin!)."])
-	label(sgde, L["Put in your priorities in Spieler tab."])
-	label(sgde, L["When all have entered, go to Regeln - ANZEIGEN,"])
-	label(sgde, L["then to Prioliste and download one of the exports on top, e.g. TXT."])
-	label(sgde, L["Copy&Paste to /prio3 config, Import field"])
+	label(sgde, L["I really encourage you to use lootguard.de! The site supports both German and English."])
+	label(sgde, L["Go to lootguard.de and select 'Start Prio Run'."])
+	label(sgde, L["Set up the raid and select the bosses."])
+	label(sgde, L["Share the LootGuard.de PIN with your raid members."])
+	label(sgde, L["Each player should set their priorities."])
+	label(sgde, L["When all have entered, click on 'Open Prio' to view the list."])
+	label(sgde, L["Use the 'Copy' button or 'Prio Export' to download the priorities."])
+	label(sgde, L["Copy & Paste the exported data into /lgc or /lootguard config, Import field"])
 
 
 	label(s, L["You could also gather your raid priorities externally, e.g. using Google Doc."])
@@ -339,7 +339,7 @@ function Prio3:HelpFrameTab_tldr(container)
 end
 
 
-function Prio3:HelpFrameTab_prio3(container)
+function LGC:HelpFrameTab_prio3(container)
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local s = AceGUI:Create("ScrollFrame")
@@ -403,7 +403,7 @@ function Prio3:HelpFrameTab_prio3(container)
 end
 
 
-function Prio3:HelpFrameTab_manual(container)
+function LGC:HelpFrameTab_manual(container)
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local s = AceGUI:Create("ScrollFrame")
@@ -514,7 +514,7 @@ function Prio3:HelpFrameTab_manual(container)
 end
 
 
-function Prio3:CreateMasterLootInfoFrame(itemId)
+function LGC:CreateMasterLootInfoFrame(itemId)
 	local frame = CreateFrame("Frame", "Prio3MasterLooterHint", UIParent, _G.BackdropTemplateMixin and "BackdropTemplate")
 	frame:SetBackdrop({
 		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
@@ -536,7 +536,7 @@ function Prio3:CreateMasterLootInfoFrame(itemId)
 	}
 
 	-- iterate over priority table
-	for user, prios in pairs(Prio3.db.profile.priorities) do
+	for user, prios in pairs(LGC.db.profile.priorities) do
 
 		-- table always has 3 elements
 		if (tonumber(prios[1]) == tonumber(itemId)) then
@@ -597,21 +597,21 @@ function Prio3:CreateMasterLootInfoFrame(itemId)
 	return frame
 end
 
-function Prio3:OPEN_MASTER_LOOT_LIST()
-	if Prio3.MLF ~= nil then
+function LGC:OPEN_MASTER_LOOT_LIST()
+	if LGC.MLF ~= nil then
 		-- hide old frame. Will still be in memory and attached to Master Looter Frame, so needs to be hidden here
-		Prio3.MLF:Hide()
-		Prio3.MLF:SetParent(nil)
+		LGC.MLF:Hide()
+		LGC.MLF:SetParent(nil)
 	end
 	-- garbage collection will take this up later on
-	Prio3.MLF = nil
+	LGC.MLF = nil
 
 
-	if Prio3.db.profile.showmasterlooterhint then
+	if LGC.db.profile.showmasterlooterhint then
 		local itemLink = GetLootSlotLink(LootFrame.selectedSlot);
 		local itemID = select(3, strfind(itemLink, "item:(%d+)"))
 
-		Prio3.MLF = self:CreateMasterLootInfoFrame(itemID)
-		if Prio3.MLF ~= nil then Prio3.MLF:ShowParent(MasterLooterFrame) end
+		LGC.MLF = self:CreateMasterLootInfoFrame(itemID)
+		if LGC.MLF ~= nil then LGC.MLF:ShowParent(MasterLooterFrame) end
 	end
 end

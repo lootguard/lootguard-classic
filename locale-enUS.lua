@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("Prio3", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("LootGuardClassic", "enUS", true)
 
 if L then
 
@@ -99,7 +99,7 @@ L["End accepting"] = "End accepting"
 L["Prio3 addon is currently disabled."] = "Prio3 addon is currently disabled."
 
 L["Congratulations on finishing the Raid!"] = "Congratulations on finishing the Raid!"
-L["Thank you for using Prio3."] = "Thank you for using the Prio3 addon."
+L["Thank you for using LGC."] = "Thank you for using the Prio3 addon."
 L["If you like it, Allaister on EU-Everlook (Alliance) is gladly taking donations!"] = "If you like it, Allaister on EU-Everlook (Alliance) is gladly taking donations!"
 
 -- used terms from core.lua
@@ -122,7 +122,7 @@ L["Priority List"] = "Priority List"
 
 
 -- help texts from gui.lua
-L["Prio3 Help"] = "Prio3 Help"
+L["Prio3 Help"] = "LootGuard Help"
 L["tl;dr"] = "tl;dr"
 L["Prio3 System"] = "Prio3 System"
 L["Manual"] = "Manual"
@@ -240,7 +240,7 @@ L["Users are notified if they have an older version of the application."] = "Use
 L["Until now, all addon synchronisation features were backwards compatible. If this changes at some point in time, a comprehensive error message will be put in place"] = "Until now, all addon synchronisation features were backwards compatible. If this changes at some point in time, a comprehensive error message will be put in place"
 
 -- load default outputs
-for k,v in pairs(Prio3.outputLocales["enUS"]) do L[k] = v end
+for k,v in pairs(LGC.outputLocales["enUS"]) do L[k] = v end
 
 
 end

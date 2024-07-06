@@ -1,7 +1,7 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
-local Prio3commPrefix = "Prio3-1.0-"
-local Prio3versionString = "v20230719"
+local Prio3commPrefix = "LootGuard-1.0-"
+local Prio3versionString = "v20240627"
 
 local defaults = {
   profile = {
@@ -37,9 +37,9 @@ local defaults = {
   }
 }
 
-function Prio3:OnInitialize()
+function LGC:OnInitialize()
   -- Code that you want to run when the addon is first loaded goes here.
-  self.db = LibStub("AceDB-3.0"):New("Prio3DB", defaults)
+  self.db = LibStub("AceDB-3.0"):New("LootGuardClassicDB", defaults)
 
   self.commPrefix = Prio3commPrefix
   self.versionString = Prio3versionString
@@ -47,10 +47,10 @@ function Prio3:OnInitialize()
 
   self.addon_id = random(1, 999999) -- should be enough
   if #self.versionString > 9 then self.addon_id = 1000000 end
-  if Prio3:isUserMasterLooter() then self.addon_id = 1000001 end
+  if LGC:isUserMasterLooter() then self.addon_id = 1000001 end
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("Prio3", self.prioOptionsTable)
-  self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Prio3", "Prio3")
+  LibStub("AceConfig-3.0"):RegisterOptionsTable("LootGuardClassic", self.prioOptionsTable)
+  self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("LootGuardClassic", "LootGuardClassic")
 
   -- Blizzard... Why doesn't GetItemInfo return items infos... No, it only starts loading them...
   self.GET_ITEM_INFO_RECEIVED_TodoList = {}
@@ -83,6 +83,8 @@ function Prio3:OnInitialize()
 
   -- /prio3 handler
   self:RegisterChatCommand('prio3', 'handleChatCommand');
+  self:RegisterChatCommand('lgc', 'handleChatCommand');
+  self:RegisterChatCommand('lootguard', 'handleChatCommand');
 
   if self.db.profile.handle_enable_prio then
 	self:RegisterChatCommand('prio', 'handleChatCommand');
@@ -121,18 +123,18 @@ function Prio3:OnInitialize()
 	for k,v in pairs(self.outputLocales[self.db.profile.outputlanguage]) do L[k] = v end
   end
 
-  if (Prio3.db.profile.translateTOTC) then
+  if (LGC.db.profile.translateTOTC) then
 	-- preload data
-	Prio3:importAtlasLootTOTC()
+	LGC:importAtlasLootTOTC()
   end
 
 end
 
-function Prio3:OnEnable()
+function LGC:OnEnable()
     -- Called when the addon is enabled
 end
 
-function Prio3:OnDisable()
+function LGC:OnDisable()
     -- Called when the addon is disabled
 end
 
@@ -162,7 +164,7 @@ function tprint (tbl, indent)
 	return toprint
 end
 
-function Prio3:tRemoveValue(t, value)
+function LGC:tRemoveValue(t, value)
 	local idx = nil
 	for i,v in pairs(t) do
 		-- do not remove while iterating table
@@ -186,7 +188,7 @@ function tempty(t)
 end
 
 
-function Prio3:isUserMasterLooter()
+function LGC:isUserMasterLooter()
 	local _, _, masterlooterRaidID = GetLootMethod()
 	if masterlooterRaidID then
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(masterlooterRaidID);
@@ -199,7 +201,7 @@ end
 
 -- config items
 
-Prio3.prioOptionsTable = {
+LGC.prioOptionsTable = {
   type = "group",
   args = {
     enable = {
@@ -207,8 +209,8 @@ Prio3.prioOptionsTable = {
       desc = L["Enables / disables the addon"],
       type = "toggle",
 	  order = 10,
-      set = function(info,val) Prio3.db.profile.enabled = val end,
-      get = function(info) return Prio3.db.profile.enabled end,
+      set = function(info,val) LGC.db.profile.enabled = val end,
+      get = function(info) return LGC.db.profile.enabled end,
     },
 	grpoutput = {
 		type = "group",
@@ -223,14 +225,14 @@ Prio3.prioOptionsTable = {
 				order = 15,
 				values = function()
 					local r = {}
-					for k,v in pairs(Prio3.outputLocales) do r[k] = k end
+					for k,v in pairs(LGC.outputLocales) do r[k] = k end
 					return r
 				end,
 				set = function(info,val)
-					Prio3.db.profile.outputlanguage = val
-					for k,v in pairs(Prio3.outputLocales[val]) do L[k] = v end
+					LGC.db.profile.outputlanguage = val
+					for k,v in pairs(LGC.outputLocales[val]) do L[k] = v end
 				end,
-				get = function(info) return Prio3.db.profile.outputlanguage end,
+				get = function(info) return LGC.db.profile.outputlanguage end,
 			},
 			newline16 = { name="", type="description", order=16 },
 			raid = {
@@ -238,8 +240,8 @@ Prio3.prioOptionsTable = {
 				desc = L["Announces Loot Priority list to raid chat"],
 				type = "toggle",
 				order = 20,
-				set = function(info,val) Prio3.db.profile.raidannounce = val end,
-				get = function(info) return Prio3.db.profile.raidannounce end
+				set = function(info,val) LGC.db.profile.raidannounce = val end,
+				get = function(info) return LGC.db.profile.raidannounce end
 			},
 			newline21 = { name="", type="description", order=21 },
 			noprio = {
@@ -247,8 +249,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Announces if there is no priority on an item"],
 			  type = "toggle",
 			  order = 30,
-			  set = function(info,val) Prio3.db.profile.noprioannounce = val end,
-			  get = function(info) return Prio3.db.profile.noprioannounce end,
+			  set = function(info,val) LGC.db.profile.noprioannounce = val end,
+			  get = function(info) return LGC.db.profile.noprioannounce end,
 			},
 			nopriofilter = {
 			  name = L["min Quality"],
@@ -257,8 +259,8 @@ Prio3.prioOptionsTable = {
 			  style = "dropdown",
 			  order = 31,
 			  values = {a = L["Poor (Grey)"], b = L["Common (White)"], c = L["Uncommon (Green)"], d = L["Rare (Blue)"], e = L["Epic (Purple)"], f = L["Legendary (Orange)"]},
-			  set = function(info,val) Prio3.db.profile.noprioannounce_quality = val end,
-			  get = function(info) return Prio3.db.profile.noprioannounce_quality end,
+			  set = function(info,val) LGC.db.profile.noprioannounce_quality = val end,
+			  get = function(info) return LGC.db.profile.noprioannounce_quality end,
 			},
 			newline32 = { name="", type="description", order=32 },
 			whisper = {
@@ -266,8 +268,8 @@ Prio3.prioOptionsTable = {
 				desc = L["Announces Loot Priority list to char by whisper"],
 				type = "toggle",
 				order = 33,
-				set = function(info,val) Prio3.db.profile.charannounce = val end,
-				get = function(info) return Prio3.db.profile.charannounce end
+				set = function(info,val) LGC.db.profile.charannounce = val end,
+				get = function(info) return LGC.db.profile.charannounce end
 			},
 
 			newline34 = { name="", type="description", order=34 },
@@ -276,8 +278,8 @@ Prio3.prioOptionsTable = {
 				desc = L["Shows hint window on Master Looter distribution"],
 				type = "toggle",
 				order = 35,
-				set = function(info,val) Prio3.db.profile.showmasterlooterhint = val end,
-				get = function(info) return Prio3.db.profile.showmasterlooterhint end
+				set = function(info,val) LGC.db.profile.showmasterlooterhint = val end,
+				get = function(info) return LGC.db.profile.showmasterlooterhint end
 			},
 
 			newline36 = { name="", type="description", order=36 },
@@ -286,8 +288,8 @@ Prio3.prioOptionsTable = {
 				desc = L["Shows Prio entries on Item Tooltips"],
 				type = "toggle",
 				order = 37,
-				set = function(info,val) Prio3.db.profile.showitemtooltip = val end,
-				get = function(info) return Prio3.db.profile.showitemtooltip end
+				set = function(info,val) LGC.db.profile.showitemtooltip = val end,
+				get = function(info) return LGC.db.profile.showitemtooltip end
 			},
 
 			newline38 = { name="", type="description", order=38 },
@@ -296,8 +298,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Activates output for Prio 0. If someone sets Prio 1, 2 and 3 to the same item, this gets precedence."],
 			  type = "toggle",
 			  order = 39,
-			  set = function(info,val) Prio3.db.profile.prio0 = val end,
-			  get = function(info) return Prio3.db.profile.prio0 end,
+			  set = function(info,val) LGC.db.profile.prio0 = val end,
+			  get = function(info) return LGC.db.profile.prio0 end,
 			},
 
 			newline50 = { name="", type="description", order=50 },
@@ -308,8 +310,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Reacts when you open a loot window."],
 			  type = "toggle",
 			  order = 55,
-			  set = function(info,val) Prio3.db.profile.lootwindow = val end,
-			  get = function(info) return Prio3.db.profile.lootwindow end,
+			  set = function(info,val) LGC.db.profile.lootwindow = val end,
+			  get = function(info) return LGC.db.profile.lootwindow end,
 			},
 			newline59 = { name="", type="description", order=59 },
 
@@ -318,8 +320,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Reacts when someone trigger a loot roll for an item. Will only work on Epics and BoP."],
 			  type = "toggle",
 			  order = 60,
-			  set = function(info,val) Prio3.db.profile.lootrolls = val end,
-			  get = function(info) return Prio3.db.profile.lootrolls end,
+			  set = function(info,val) LGC.db.profile.lootrolls = val end,
+			  get = function(info) return LGC.db.profile.lootrolls end,
 			},
 			newline69 = { name="", type="description", order=69 },
 
@@ -328,8 +330,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Reacts when someone sends a raid warning with an item link."],
 			  type = "toggle",
 			  order = 70,
-			  set = function(info,val) Prio3.db.profile.raidwarnings = val end,
-			  get = function(info) return Prio3.db.profile.raidwarnings end,
+			  set = function(info,val) LGC.db.profile.raidwarnings = val end,
+			  get = function(info) return LGC.db.profile.raidwarnings end,
 			},
 			newline79 = { name="", type="description", order=79 },
 
@@ -338,8 +340,8 @@ Prio3.prioOptionsTable = {
 			  desc = L["Ignore if you open a loot window containing crystals or large shards."],
 			  type = "toggle",
 			  order = 80,
-			  set = function(info,val) Prio3.db.profile.ignoredisenchants = val end,
-			  get = function(info) return Prio3.db.profile.ignoredisenchants end,
+			  set = function(info,val) LGC.db.profile.ignoredisenchants = val end,
+			  get = function(info) return LGC.db.profile.ignoredisenchants end,
 			},
 			newline89 = { name="", type="description", order=89 },
 
@@ -348,16 +350,16 @@ Prio3.prioOptionsTable = {
 			  desc = L["Ignore if someone raid warns about the Onyxia Scale Cloak"],
 			  type = "toggle",
 			  order = 90,
-			  set = function(info,val) Prio3.db.profile.ignorescalecloak = val end,
-			  get = function(info) return Prio3.db.profile.ignorescalecloak end,
+			  set = function(info,val) LGC.db.profile.ignorescalecloak = val end,
+			  get = function(info) return LGC.db.profile.ignorescalecloak end,
 			},
 			ignoredrakefire = {
 			  name = L["Ignore Drakefire"],
 			  desc = L["Ignore if someone raid warns about the Drakefire Amulet"],
 			  type = "toggle",
 			  order = 91,
-			  set = function(info,val) Prio3.db.profile.ignoredrakefire = val end,
-			  get = function(info) return Prio3.db.profile.ignoredrakefire end,
+			  set = function(info,val) LGC.db.profile.ignoredrakefire = val end,
+			  get = function(info) return LGC.db.profile.ignoredrakefire end,
 			},
 			newline99 = { name="", type="description", order=99 },
 
@@ -370,8 +372,8 @@ Prio3.prioOptionsTable = {
 				step = 1,
 				bigStep = 15,
 				order = 100,
-				set = function(info,val) Prio3.db.profile.ignorereopen = val end,
-				get = function(info) return Prio3.db.profile.ignorereopen end
+				set = function(info,val) LGC.db.profile.ignorereopen = val end,
+				get = function(info) return LGC.db.profile.ignorereopen end
 			},
 
 		}
@@ -385,35 +387,35 @@ Prio3.prioOptionsTable = {
 				desc = L["Allows to query own priority. Whisper prio."],
 				type = "toggle",
 				order = 60,
-				set = function(info,val) Prio3.db.profile.queryself = val end,
-				get = function(info) return Prio3.db.profile.queryself end,
+				set = function(info,val) LGC.db.profile.queryself = val end,
+				get = function(info) return LGC.db.profile.queryself end,
 			},
 			newline61 = { name="", type="description", order=61 },
 			queryraid = {
 				name = L["Query raid priorities"],
 				desc = L["Allows to query priorities of all raid members. Whisper prio CHARNAME."],
 				type = "toggle",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 63,
-				set = function(info,val) Prio3.db.profile.queryraid = val end,
-				get = function(info) return Prio3.db.profile.queryraid end,
+				set = function(info,val) LGC.db.profile.queryraid = val end,
+				get = function(info) return LGC.db.profile.queryraid end,
 			},
 			newline64 = { name="", type="description", order=64 },
 			queryitems = {
 				name = L["Query item priorities"],
 				desc = L["Allows to query own priority. Whisper prio ITEMLINK."],
 				type = "toggle",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 65,
-				set = function(info,val) Prio3.db.profile.queryitems = val end,
-				get = function(info) return Prio3.db.profile.queryitems end,
+				set = function(info,val) LGC.db.profile.queryitems = val end,
+				get = function(info) return LGC.db.profile.queryitems end,
 			},
 			newline66 = { name="", type="description", order=66 },
 			showtable = {
 				name = L["Show prio table"],
 				type = "execute",
 				order = 99,
-				func = function(info) Prio3:guiPriorityFrame() end,
+				func = function(info) LGC:guiPriorityFrame() end,
 			},
 		}
 	},
@@ -426,21 +428,21 @@ Prio3.prioOptionsTable = {
 				name = L["Clear prio table"],
 				desc = L["Please note that current Prio settings WILL BE OVERWRITTEN"],
 				type = "execute",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 31,
 				confirm = true,
-				func = function(info) Prio3.db.profile.priorities = {} end,
+				func = function(info) LGC.db.profile.priorities = {} end,
 			},
 			newprio = {
 				name = L["Import String"],
 				desc = L["Please note that current Prio settings WILL BE OVERWRITTEN"],
 				type = "input",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 48,
 				confirm = true,
 				width = 3.0,
 				multiline = true,
-				set = function(info, value) Prio3:SetPriorities(info, value)  end,
+				set = function(info, value) LGC:SetPriorities(info, value)  end,
 				usage = L["Enter new exported string here to configure Prio3 loot list"],
 				cmdHidden = true,
 			},
@@ -452,10 +454,10 @@ Prio3.prioOptionsTable = {
 				type = "toggle",
 				order = 50,
 				set = function(info,val)
-					Prio3.db.profile.translateTOTC = val
-					if (Prio3.db.profile.translateTOTC) then Prio3:importAtlasLootTOTC() end
+					LGC.db.profile.translateTOTC = val
+					if (LGC.db.profile.translateTOTC) then LGC:importAtlasLootTOTC() end
 				end,
-				get = function(info) return Prio3.db.profile.translateTOTC end,
+				get = function(info) return LGC.db.profile.translateTOTC end,
 			},
 
 
@@ -463,9 +465,9 @@ Prio3.prioOptionsTable = {
 			resendprio = {
 				name = L["Resend prios"],
 				type = "execute",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 52,
-				func = function(info,val) Prio3:sendPriorities() end,
+				func = function(info,val) LGC:sendPriorities() end,
 			},
 			newline53 = { name="", type="description", order=53 },
 			newwhispers = {
@@ -473,23 +475,23 @@ Prio3.prioOptionsTable = {
 				desc = L["Whisper imported items to player"],
 				type = "toggle",
 				order = 54,
-				set = function(info,val) Prio3.db.profile.whisperimport = val end,
-				get = function(info) return Prio3.db.profile.whisperimport end,
+				set = function(info,val) LGC.db.profile.whisperimport = val end,
+				get = function(info) return LGC.db.profile.whisperimport end,
 			},
 			newline56 = { name="", type="description", order=56 },
 			opentable = {
 				name = L["Open prio table after import"],
 				type = "toggle",
 				order = 75,
-				set = function(info,val) Prio3.db.profile.opentable = val end,
-				get = function(info) return Prio3.db.profile.opentable end,
+				set = function(info,val) LGC.db.profile.opentable = val end,
+				get = function(info) return LGC.db.profile.opentable end,
 			},
 			newline76 = { name="", type="description", order=76 },
 			showtable = {
 				name = L["Show prio table"],
 				type = "execute",
 				order = 99,
-				func = function(info) Prio3:guiPriorityFrame() end,
+				func = function(info) LGC:guiPriorityFrame() end,
 			},
 
 			newline100 = { name="", type="description", order=100 },
@@ -507,57 +509,57 @@ Prio3.prioOptionsTable = {
 				desc = L["Accept only from new players without priorities yet. If disabled, accepts from all players and allow overwriting"],
 				type = "toggle",
 				order = 120,
-				set = function(info,val) Prio3.db.profile.acceptwhisperprios_new = val end,
-				get = function(info) return Prio3.db.profile.acceptwhisperprios_new end,
+				set = function(info,val) LGC.db.profile.acceptwhisperprios_new = val end,
+				get = function(info) return LGC.db.profile.acceptwhisperprios_new end,
 			},
 			newline125 = { name="", type="description", order=125 },
 
 			acceptwhisperprios_start = {
 				name = L["Start accepting"],
 				desc = "",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				type = "execute",
 				order = 140,
 				func = function()
-					Prio3.db.profile.acceptwhispers_storedsettings = {
-						comm_enable_prio = Prio3.db.profile.comm_enable_prio,
-						queryraid = Prio3.db.profile.queryraid,
-						queryitems = Prio3.db.profile.queryitems,
-						whisperimport = Prio3.db.profile.whisperimport
+					LGC.db.profile.acceptwhispers_storedsettings = {
+						comm_enable_prio = LGC.db.profile.comm_enable_prio,
+						queryraid = LGC.db.profile.queryraid,
+						queryitems = LGC.db.profile.queryitems,
+						whisperimport = LGC.db.profile.whisperimport
 					}
-					Prio3.db.profile.comm_enable_prio = false
-					Prio3.db.profile.queryraid = false
-					Prio3.db.profile.queryitems = false
-					Prio3.db.profile.whisperimport = true
-					Prio3.db.profile.acceptwhisperprios = true
+					LGC.db.profile.comm_enable_prio = false
+					LGC.db.profile.queryraid = false
+					LGC.db.profile.queryitems = false
+					LGC.db.profile.whisperimport = true
+					LGC.db.profile.acceptwhisperprios = true
 
-					Prio3:Output(L["Now accepting Prio3 updates by whisper. Send 3 [Itemlinks], wowhead Links or IDs my way, separated by space or comma"])
-					if Prio3.db.profile.acceptwhisperprios_new then
-						Prio3:Output(L["Only accepting whispers from players who have not yet set a priority."])
+					LGC:Output(L["Now accepting Prio3 updates by whisper. Send 3 [Itemlinks], wowhead Links or IDs my way, separated by space or comma"])
+					if LGC.db.profile.acceptwhisperprios_new then
+						LGC:Output(L["Only accepting whispers from players who have not yet set a priority."])
 					end
 				end
 			},
 			acceptwhisperprios_end = {
 				name = L["End accepting"],
 				desc = "",
-				disabled = function() return not Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return not LGC.db.profile.acceptwhisperprios end,
 				type = "execute",
 				order = 145,
 				func = function()
-					if Prio3.db.profile.acceptwhispers_storedsettings then
-						Prio3.db.profile.comm_enable_prio = Prio3.db.profile.acceptwhispers_storedsettings.comm_enable_prio
-						Prio3.db.profile.queryraid = Prio3.db.profile.acceptwhispers_storedsettings.queryraid
-						Prio3.db.profile.whisperimport = Prio3.db.profile.acceptwhispers_storedsettings.whisperimport
-						Prio3.db.profile.queryitems = Prio3.db.profile.acceptwhispers_storedsettings.queryitems
+					if LGC.db.profile.acceptwhispers_storedsettings then
+						LGC.db.profile.comm_enable_prio = LGC.db.profile.acceptwhispers_storedsettings.comm_enable_prio
+						LGC.db.profile.queryraid = LGC.db.profile.acceptwhispers_storedsettings.queryraid
+						LGC.db.profile.whisperimport = LGC.db.profile.acceptwhispers_storedsettings.whisperimport
+						LGC.db.profile.queryitems = LGC.db.profile.acceptwhispers_storedsettings.queryitems
 					end
 
-					Prio3.db.profile.acceptwhisperprios = false
+					LGC.db.profile.acceptwhisperprios = false
 
-					Prio3:sendPriorities()
+					LGC:sendPriorities()
 
-					Prio3:Output(L["No longer accepting Prio3 updates by whisper."])
-					for user,prios in pairs(Prio3.db.profile.priorities) do
-						Prio3:OutputUserPrio(user, "RAID")
+					LGC:Output(L["No longer accepting Prio3 updates by whisper."])
+					for user,prios in pairs(LGC.db.profile.priorities) do
+						LGC:OutputUserPrio(user, "RAID")
 					end
 
 				end,
@@ -574,10 +576,10 @@ Prio3.prioOptionsTable = {
 				name = "Sync priorities",
 				desc = "Allows to sync priorities between multiple users in the same raid running Prio3",
 				type = "toggle",
-				disabled = function() return Prio3.db.profile.acceptwhisperprios end,
+				disabled = function() return LGC.db.profile.acceptwhisperprios end,
 				order = 10,
-				set = function(info,val) Prio3.db.profile.comm_enable_prio = val end,
-				get = function(info) return Prio3.db.profile.comm_enable_prio end,
+				set = function(info,val) LGC.db.profile.comm_enable_prio = val end,
+				get = function(info) return LGC.db.profile.comm_enable_prio end,
 			},
 			newline2 = { name="", type="description", order=19 },
 			syncitems = {
@@ -585,15 +587,15 @@ Prio3.prioOptionsTable = {
 				desc = "Prevents other users from posting the same item you already posted.",
 				type = "toggle",
 				order = 20,
-				set = function(info,val) Prio3.db.profile.comm_enable_item = val end,
-				get = function(info) return Prio3.db.profile.comm_enable_item end,
+				set = function(info,val) LGC.db.profile.comm_enable_item = val end,
+				get = function(info) return LGC.db.profile.comm_enable_item end,
 			},
 			newline3 = { name="", type="description", order=29 },
 			resendprio = {
 				name = L["Resend prios"],
 				type = "execute",
 				order = 30,
-				func = function(info,val) Prio3:sendPriorities() end,
+				func = function(info,val) LGC:sendPriorities() end,
 			},
 			newline4 = { name="", type="description", order=39 },
 			priohandler = {
@@ -601,14 +603,14 @@ Prio3.prioOptionsTable = {
 				type = "toggle",
 				order = 40,
 				set = function(info,val)
-					Prio3.db.profile.handle_enable_prio = val
-					if Prio3.db.profile.handle_enable_prio then
-						Prio3:RegisterChatCommand('prio', 'handleChatCommand');
+					LGC.db.profile.handle_enable_prio = val
+					if LGC.db.profile.handle_enable_prio then
+						LGC:RegisterChatCommand('prio', 'handleChatCommand');
 					else
-						Prio3:UnregisterChatCommand('prio', 'handleChatCommand');
+						LGC:UnregisterChatCommand('prio', 'handleChatCommand');
 					end
 				end,
-				get = function(info) return Prio3.db.profile.handle_enable_prio end,
+				get = function(info) return LGC.db.profile.handle_enable_prio end,
 			},
 			newline5 = { name="", type="description", order=49 },
 			p3handler = {
@@ -616,14 +618,14 @@ Prio3.prioOptionsTable = {
 				type = "toggle",
 				order = 50,
 				set = function(info,val)
-					Prio3.db.profile.handle_enable_p3 = val
-					if Prio3.db.profile.handle_enable_p3 then
-						Prio3:RegisterChatCommand('p3', 'handleChatCommand');
+					LGC.db.profile.handle_enable_p3 = val
+					if LGC.db.profile.handle_enable_p3 then
+						LGC:RegisterChatCommand('p3', 'handleChatCommand');
 					else
-						Prio3:UnregisterChatCommand('p3', 'handleChatCommand');
+						LGC:UnregisterChatCommand('p3', 'handleChatCommand');
 					end
 				end,
-				get = function(info) return Prio3.db.profile.handle_enable_p3 end,
+				get = function(info) return LGC.db.profile.handle_enable_p3 end,
 			},
 
 		}
@@ -636,7 +638,7 @@ Prio3.prioOptionsTable = {
 			  name = "My Version",
 			  type = "input",
 			  order = 10,
-			  get = function(info) return strsub(Prio3.versionString, 1, 9) end,
+			  get = function(info) return strsub(LGC.versionString, 1, 9) end,
 			  disabled = true,
 			},
 			newline1 = { name="", type="description", order=10 },
@@ -646,7 +648,7 @@ Prio3.prioOptionsTable = {
 				order = 20,
 				width = 3.0,
 				multiline = 15,
-				get = function(info) return tprint(Prio3.raidversions) end,
+				get = function(info) return tprint(LGC.raidversions) end,
 				disabled = true,
 			},
 
@@ -658,29 +660,29 @@ Prio3.prioOptionsTable = {
       desc = L["Enters Debug mode. Addon will have advanced output, and work outside of Raid"],
       type = "toggle",
       order = 98,
-      set = function(info,val) Prio3.db.profile.debug = val end,
-      get = function(info) return Prio3.db.profile.debug end
+      set = function(info,val) LGC.db.profile.debug = val end,
+      get = function(info) return LGC.db.profile.debug end
     },
 
 	showhelp = {
 		name = "Help",
 		type = "execute",
 		order = 99,
-		func = function(info) Prio3:guiHelpFrame() end,
+		func = function(info) LGC:guiHelpFrame() end,
 	},
 
 	}
 }
 
-function Prio3:Debug(t, lvl)
+function LGC:Debug(t, lvl)
     if lvl == nil then
 	  lvl = "DEBUG"
 	end
-	if (Prio3.db.profile.debug) then
+	if (LGC.db.profile.debug) then
 		if (type(t) == "table") then
-			Prio3:Print(lvl .. ": " .. tprint(t))
+			LGC:Print(lvl .. ": " .. tprint(t))
 		else
-			Prio3:Print(lvl .. ": " .. t)
+			LGC:Print(lvl .. ": " .. t)
 		end
 	end
 end

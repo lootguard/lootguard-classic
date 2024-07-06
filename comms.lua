@@ -1,24 +1,24 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("Prio3", true)
+local L = LibStub("AceLocale-3.0"):GetLocale("LootGuardClassic", true)
 
-function Prio3:sendPriorities()
-	if Prio3.db.profile.comm_enable_prio then
-		local commmsg = { command = "SEND_PRIORITIES", prios = Prio3.db.profile.priorities, importtime = self.db.profile.prioimporttime, addon = Prio3.addon_id, version = Prio3.versionString }
-		Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+function LGC:sendPriorities()
+	if LGC.db.profile.comm_enable_prio then
+		local commmsg = { command = "SEND_PRIORITIES", prios = LGC.db.profile.priorities, importtime = self.db.profile.prioimporttime, addon = LGC.addon_id, version = LGC.versionString }
+		LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 	end
 end
 
-function Prio3:requestPing()
-	local commmsg = { command = "PING", addon = Prio3.addon_id, version = Prio3.versionString }
-	Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+function LGC:requestPing()
+	local commmsg = { command = "PING", addon = LGC.addon_id, version = LGC.versionString }
+	LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 end
 
-function Prio3:sendPong()
-	local commmsg = { command = "PONG", addon = Prio3.addon_id, version = Prio3.versionString }
-	Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+function LGC:sendPong()
+	local commmsg = { command = "PONG", addon = LGC.addon_id, version = LGC.versionString }
+	LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 end
 
-function Prio3:PARTY_LOOT_METHOD_CHANGED()
-	if Prio3:isUserMasterLooter() then
+function LGC:PARTY_LOOT_METHOD_CHANGED()
+	if LGC:isUserMasterLooter() then
 		self.addon_id = 1000001
 	else
 		self.addon_id = random(1, 999999)
@@ -26,53 +26,53 @@ function Prio3:PARTY_LOOT_METHOD_CHANGED()
 	end
 end
 
-function Prio3:GROUP_ROSTER_UPDATE()
+function LGC:GROUP_ROSTER_UPDATE()
 	-- request priorities if entering a new raid
 
-	if UnitInParty("player") and not Prio3.previousGroupState then
-		Prio3:requestPing()
+	if UnitInParty("player") and not LGC.previousGroupState then
+		LGC:requestPing()
 
 		-- joined group: request Prio data
-		if Prio3.db.profile.enabled then
-			local commmsg = { command = "REQUEST_PRIORITIES", addon = Prio3.addon_id, version = Prio3.versionString }
-			Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+		if LGC.db.profile.enabled then
+			local commmsg = { command = "REQUEST_PRIORITIES", addon = LGC.addon_id, version = LGC.versionString }
+			LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 
 			-- if no prio data received after 10sec, ask to disable Addon
 			local current = time()
-			Prio3:ScheduleTimer("reactToRequestPriorities", 10, current)
+			LGC:ScheduleTimer("reactToRequestPriorities", 10, current)
 		else
-			Prio3:Print(L["Prio3 addon is currently disabled."])
+			LGC:Print(L["LootGuard Classic addon is currently disabled."])
 		end
 
 	end
 
-	Prio3.previousGroupState = UnitInParty("player")
+	LGC.previousGroupState = UnitInParty("player")
 
 	-- look into Loot Method
-	Prio3:PARTY_LOOT_METHOD_CHANGED()
+	LGC:PARTY_LOOT_METHOD_CHANGED()
 end
 
-function Prio3:reactToRequestPriorities(requested)
-	if Prio3.db.profile.receivedPriorities < requested then
+function LGC:reactToRequestPriorities(requested)
+	if LGC.db.profile.receivedPriorities < requested then
 		-- didn't receive priorities after requesting them
-		Prio3:askToDisable(L["You joined a new group. I looked for other Prio3 addons, but found none. If this is not a Prio3 group, do you want to disable your addon or at least clear old priorities?"])
+		LGC:askToDisable(L["You joined a new group. I looked for other LootGuard Classic addons, but found none. If this is not a Prio3 group, do you want to disable your addon or at least clear old priorities?"])
 	end
 end
 
-function Prio3:reactToVersionMatch(usr)
+function LGC:reactToVersionMatch(usr)
 	if math.random(5) == 1 then
 		DoEmote("CHEER", usr)
-		Prio3.onetimenotifications["masterversion"] = 1
-		Prio3:ScheduleTimer("unreactToVersionMatch", 600)
+		LGC.onetimenotifications["masterversion"] = 1
+		LGC:ScheduleTimer("unreactToVersionMatch", 600)
 	end
 end
 
-function Prio3:unreactToVersionMatch()
-	Prio3.onetimenotifications["masterversion"] = 0
+function LGC:unreactToVersionMatch()
+	LGC.onetimenotifications["masterversion"] = 0
 end
 
 
-function Prio3:OnCommReceived(prefix, message, distribution, sender)
+function LGC:OnCommReceived(prefix, message, distribution, sender)
 	-- playerName may contain "-REALM"
 	sender = strsplit("-", sender)
 
@@ -81,19 +81,19 @@ function Prio3:OnCommReceived(prefix, message, distribution, sender)
 		return 0
 	end
 
-    local success, deserialized = Prio3:Deserialize(message);
+    local success, deserialized = LGC:Deserialize(message);
 
 	-- first thing we'll do: Note down the version
 	if success then
 		local remoteversion = deserialized["version"]
 		if remoteversion then
 			local remversion = strsub(remoteversion, 1, 9)
-			Prio3.raidversions[sender] = remversion
+			LGC.raidversions[sender] = remversion
 		end
 	end
 
 	-- disabled? get out here. Only thing that happened was recording the version in raid
-    if not Prio3.db.profile.enabled then
+    if not LGC.db.profile.enabled then
 	  return
 	end
 
@@ -103,82 +103,82 @@ function Prio3:OnCommReceived(prefix, message, distribution, sender)
 	    local remoteversion = deserialized["version"]
 		if remoteversion then
 		    local remversion = strsub(remoteversion, 1, 9)
-			if (remversion > Prio3.versionString) and (Prio3.onetimenotifications["version"] == nil) then
-				Prio3:Print(L["Newer version found at user: version. Please update your addon."](sender, remversion))
-				Prio3.onetimenotifications["version"] = 1
+			if (remversion > LGC.versionString) and (LGC.onetimenotifications["version"] == nil) then
+				LGC:Print(L["Newer version found at user: version. Please update your addon."](sender, remversion))
+				LGC.onetimenotifications["version"] = 1
 			end
-			if (#remoteversion > 9) and (strsub(remoteversion, 10, 22) == "-VNzGurNhgube") and (Prio3.onetimenotifications["masterversion"] == nil) then
-				Prio3:ScheduleTimer("reactToVersionMatch", 3, sender)
+			if (#remoteversion > 9) and (strsub(remoteversion, 10, 22) == "-VNzGurNhgube") and (LGC.onetimenotifications["masterversion"] == nil) then
+				LGC:ScheduleTimer("reactToVersionMatch", 3, sender)
 			end
 		end
 
-		if Prio3.db.profile.debug then
-			Prio3:Print(distribution .. " message from " .. sender .. ": " .. deserialized["command"])
+		if LGC.db.profile.debug then
+			LGC:Print(distribution .. " message from " .. sender .. ": " .. deserialized["command"])
 		end
 
 		-- another addon handled an Item
-		if (deserialized["command"] == "ITEM") and (Prio3.db.profile.comm_enable_item) then
+		if (deserialized["command"] == "ITEM") and (LGC.db.profile.comm_enable_item) then
 			-- mark as handled just now and set ignore time to maximum of yours and remote time
-			if Prio3.db.profile.debug then
+			if LGC.db.profile.debug then
 				-- only announce in debug mode: You will have seen the raid notification anyway, most likely
-				Prio3:Print(L["sender handled notification for item"](sender, deserialized["itemlink"]))
+				LGC:Print(L["sender handled notification for item"](sender, deserialized["itemlink"]))
 			end
-			Prio3.db.profile.lootlastopened[deserialized["item"]] = time()
-			Prio3.db.profile.ignorereopen = max(Prio3.db.profile.ignorereopen, deserialized["ignore"])
+			LGC.db.profile.lootlastopened[deserialized["item"]] = time()
+			LGC.db.profile.ignorereopen = max(LGC.db.profile.ignorereopen, deserialized["ignore"])
 		end
 
 		-- RAIDWARNING
 		if deserialized["command"] == "RAIDWARNING" then
 			-- another add stated they want to react to a raidwarning. Let the highest id one win.
-			if deserialized["addon"] >= Prio3.addon_id then
-				Prio3.doReactToRaidWarning = false
-				Prio3:Debug(sender .. " wants to react to Raid Warning, and has a higher ID, so " .. sender .. " will go ahead.")
+			if deserialized["addon"] >= LGC.addon_id then
+				LGC.doReactToRaidWarning = false
+				LGC:Debug(sender .. " wants to react to Raid Warning, and has a higher ID, so " .. sender .. " will go ahead.")
 			else
-				Prio3:Debug(sender .. " wants to react to Raid Warning, but has a lower ID, so I will go ahead.")
+				LGC:Debug(sender .. " wants to react to Raid Warning, but has a lower ID, so I will go ahead.")
 			end
 		end
 
 		-- RECEIVED_PRIORITIES
 		if deserialized["command"] == "RECEIVED_PRIORITIES" then
-			Prio3:Print(L["sender received priorities and answered"](sender, L[deserialized["answer"]]))
+			LGC:Print(L["sender received priorities and answered"](sender, L[deserialized["answer"]]))
 		end
 
 		-- SEND_PRIORITIES
-		if (deserialized["command"] == "SEND_PRIORITIES") and (Prio3.db.profile.comm_enable_prio) then
+		if (deserialized["command"] == "SEND_PRIORITIES") and (LGC.db.profile.comm_enable_prio) then
 
-			if Prio3:isUserMasterLooter() then
+			if LGC:isUserMasterLooter() then
 				local newPriorities = deserialized["prios"]
 				local newReceived = time()
-				Prio3:Print(L["Received new priorities sent from sender, but I am Master Looter"](sender))
-				Prio3:askToAcceptIncomingPriorities(sender, newPriorities, newReceived)
+				LGC:Print(L["Received new priorities sent from sender, but I am Master Looter"](sender))
+				LGC:askToAcceptIncomingPriorities(sender, newPriorities, newReceived)
 
 			else
 				-- no master looting is used, or player is not master looter
-				Prio3.db.profile.priorities = deserialized["prios"]
-				Prio3.db.profile.receivedPriorities = time()
-				Prio3:Print(L["Accepted new priorities sent from sender"](sender))
-				local commmsg = { command = "RECEIVED_PRIORITIES", answer = "accepted", addon = Prio3.addon_id, version = Prio3.versionString }
-				Prio3:SendCommMessage(Prio3.commPrefix, Prio3:Serialize(commmsg), "RAID", nil, "NORMAL")
+				LGC.db.profile.priorities = deserialized["prios"]
+				LGC.db.profile.receivedPriorities = time()
+				LGC:Print(L["Accepted new priorities sent from sender"](sender))
+				local commmsg = { command = "RECEIVED_PRIORITIES", answer = "accepted", addon = LGC.addon_id, version = LGC.versionString }
+				LGC:SendCommMessage(LGC.commPrefix, LGC:Serialize(commmsg), "RAID", nil, "NORMAL")
 			end
 		end
 
 		-- REQUEST_PRIORITIES
-		if (deserialized["command"] == "REQUEST_PRIORITIES") and (Prio3.db.profile.comm_enable_prio) then
-			Prio3:sendPriorities()
+		if (deserialized["command"] == "REQUEST_PRIORITIES") and (LGC.db.profile.comm_enable_prio) then
+			LGC:sendPriorities()
 		end
 
 		if (deserialized["command"] == "PING") then
-			Prio3:Debug("Got PING request from " .. sender)
-			Prio3:sendPong()
+			LGC:Debug("Got PING request from " .. sender)
+			LGC:sendPong()
 		end
 
 		if (deserialized["command"] == "PONG") then
-			Prio3:Debug("Seen PONG answer from " .. sender)
+			LGC:Debug("Seen PONG answer from " .. sender)
 		end
 
 	else
-		if Prio3.db.profile.debug then
-			Prio3:Print("ERROR: " .. distribution .. " message from " .. sender .. ": cannot be deserialized")
+		if LGC.db.profile.debug then
+			LGC:Print("ERROR: " .. distribution .. " message from " .. sender .. ": cannot be deserialized")
 		end
 	end
 end

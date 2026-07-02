@@ -53,11 +53,13 @@ function LGC:LOOT_OPENED()
 		if itemLink then
 			-- if no itemLink, it's most likely money
 
-			local d, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId, linkLevel, specializationID, reforgeId, unknown1, unknown2 = strsplit(":", itemLink)
+			-- Extract item ID and color code from itemLink
+			local d = strmatch(itemLink, "(\124c%x+)\124Hitem")  -- Extract color code
+			local itemId = tonumber(strmatch(itemLink, "item:(%d+)"))  -- Extract item ID
 
             -- check for disenchant mats
-			if LGC.db.profile.ignoredisenchants then
-				local i = tonumber(itemId)
+			if LGC.db.profile.ignoredisenchants and itemId then
+				local i = itemId
 				if i == 20725 or i == 14344 -- Nexus Crystal / Large Briliant Shard
 				or i == 22450 or i == 22449 -- Void Crystal / Large Prismatic Shard
 				or i == 34057 or i == 34052 -- Abyss Crystal / Dream Shard
@@ -251,8 +253,14 @@ function LGC:HandleLoot(itemLink, qualityFound)
 		return
 	end
 
-	local _, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId, linkLevel, specializationID, reforgeId, unknown1, unknown2 = strsplit(":", itemLink)
+	-- Extract itemId from itemLink using pattern matching (more reliable than strsplit)
+	local itemId = tonumber(strmatch(itemLink, "item:(%d+)"))
+
 	-- bad argument, might be gold? (or copper, here)
+	if not itemId then
+		LGC:Debug("Could not extract item ID from: " .. tostring(itemLink))
+		return
+	end
 
     if tonumber(itemId) == 29434 then
 	  -- badge of justice, ignore
@@ -390,7 +398,7 @@ end
 
 function LGC:Output(msg)
 	if LGC.db.profile.raidannounce and UnitInRaid("player") then
-		SendChatMessage(msg, "RAID")
+		SendChatMessage(msg, "RAID_WARNING")
 		return true
 	else
 		LGC:Print(msg)

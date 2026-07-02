@@ -239,6 +239,19 @@ L["There is a 'Versions' tab in the options, which is basically only there for d
 L["Users are notified if they have an older version of the application."] = "Users are notified if they have an older version of the application."
 L["Until now, all addon synchronisation features were backwards compatible. If this changes at some point in time, a comprehensive error message will be put in place"] = "Until now, all addon synchronisation features were backwards compatible. If this changes at some point in time, a comprehensive error message will be put in place"
 
+-- Missing LootGuard integration strings
+L["Go to /lgc or /lootguard config, Import, Accept whispers"] = "Go to /lgc or /lootguard config, Import, Accept whispers"
+L["You can verify who answered by /lgc or /lootguard"] = "You can verify who answered by /lgc or /lootguard"
+L["Participants will need to have the LootGuard Classic addon to see current list."] = "Participants will need to have the LootGuard Classic addon to see current list."
+L["I really encourage you to use lootguard.de! The site supports both German and English."] = "I really encourage you to use lootguard.de! The site supports both German and English."
+L["Go to lootguard.de and select 'Start Prio Run'."] = "Go to lootguard.de and select 'Start Prio Run'."
+L["Set up the raid and select the bosses."] = "Set up the raid and select the bosses."
+L["Share the LootGuard.de PIN with your raid members."] = "Share the LootGuard.de PIN with your raid members."
+L["Each player should set their priorities."] = "Each player should set their priorities."
+L["When all have entered, click on 'Open Prio' to view the list."] = "When all have entered, click on 'Open Prio' to view the list."
+L["Use the 'Copy' button or 'Prio Export' to download the priorities."] = "Use the 'Copy' button or 'Prio Export' to download the priorities."
+L["Copy & Paste the exported data into /lgc or /lootguard config, Import field"] = "Copy & Paste the exported data into /lgc or /lootguard config, Import field"
+
 -- load default outputs
 for k,v in pairs(LGC.outputLocales["enUS"]) do L[k] = v end
 

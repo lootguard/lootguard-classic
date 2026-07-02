@@ -47,7 +47,7 @@ function LGC:OnInitialize()
 
   self.addon_id = random(1, 999999) -- should be enough
   if #self.versionString > 9 then self.addon_id = 1000000 end
-  if LGC:isUserMasterLooter() then self.addon_id = 1000001 end
+  -- Master looter check moved to OnEnable to ensure API is available
 
   LibStub("AceConfig-3.0"):RegisterOptionsTable("LootGuardClassic", self.prioOptionsTable)
   self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("LootGuardClassic", "LootGuardClassic")
@@ -132,6 +132,10 @@ end
 
 function LGC:OnEnable()
     -- Called when the addon is enabled
+    -- Set addon_id to master looter priority if applicable
+    if LGC:isUserMasterLooter() then
+        self.addon_id = 1000001
+    end
 end
 
 function LGC:OnDisable()
@@ -189,11 +193,39 @@ end
 
 
 function LGC:isUserMasterLooter()
-	local _, _, masterlooterRaidID = GetLootMethod()
-	if masterlooterRaidID then
+	-- Safe wrapper for GetLootMethod - may not be available during early addon loading
+	if not GetLootMethod then
+		return LGC:isRaidLeaderOrAssist()
+	end
+
+	local success, lootmethod, masterlooterPartyID, masterlooterRaidID = pcall(GetLootMethod)
+	if not success then
+		return LGC:isRaidLeaderOrAssist()
+	end
+
+	-- If Master Loot is active, check if player is the Master Looter
+	if lootmethod == "master" and masterlooterRaidID then
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(masterlooterRaidID);
 		if isML and name == UnitName("player") then
 			return true
+		end
+		return false
+	end
+
+	-- For other loot methods (Personal Loot, Group Loot, Need Before Greed),
+	-- allow Raid Leader or Raid Assist to announce
+	return LGC:isRaidLeaderOrAssist()
+end
+
+function LGC:isRaidLeaderOrAssist()
+	if not UnitInRaid("player") then
+		return false
+	end
+	for i = 1, GetNumGroupMembers() do
+		local name, rank = GetRaidRosterInfo(i)
+		if name == UnitName("player") then
+			-- rank 2 = Leader, rank 1 = Assistant
+			return rank >= 1
 		end
 	end
 	return false

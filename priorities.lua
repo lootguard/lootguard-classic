@@ -78,6 +78,11 @@ end
 
 
 function LGC:toPriorityId(s)
+	-- Handle nil or empty input
+	if not s or s == "" then
+		return 0
+	end
+
 	for id in string.gmatch(s, "%d+") do
 
 		-- there are some items that are rewards from quest items
@@ -135,6 +140,9 @@ function LGC:toPriorityId(s)
 		GetItemInfo(id) -- firing server-side request here, so it can start getting cached early
 		return id
 	end
+
+	-- No number found in string, return 0 as default
+	return 0
 end
 
 function LGC:OutputUserPrio(user, channel)
@@ -190,21 +198,24 @@ function LGC:HandleNewPriorities(user, prio1, prio2, prio3, origin)
 
 		if prio1 == nil then
 			LGC:Debug("No prio1 found in " .. origin)
+			p1 = 0
 		else
 			p1 = LGC:toPriorityId(prio1)
-			LGC:Debug("Found PRIORITY 1 ITEM " .. p1 .. " for user " .. user .. " in " .. origin)
+			LGC:Debug("Found PRIORITY 1 ITEM " .. tostring(p1) .. " for user " .. user .. " in " .. origin)
 		end
 		if prio2 == nil then
 			LGC:Debug("No prio2 found in " .. origin)
+			p2 = 0
 		else
 			p2 = LGC:toPriorityId(prio2)
-			LGC:Debug("Found PRIORITY 2 ITEM " .. p2 .. " for user " .. user .. " in " .. origin)
+			LGC:Debug("Found PRIORITY 2 ITEM " .. tostring(p2) .. " for user " .. user .. " in " .. origin)
 		end
 		if prio3 == nil then
 			LGC:Debug("No prio3 found in " .. origin)
+			p3 = 0
 		else
 			p3 = LGC:toPriorityId(prio3)
-			LGC:Debug("Found PRIORITY 3 ITEM " .. p3 .. " for user " .. user .. " in " .. origin)
+			LGC:Debug("Found PRIORITY 3 ITEM " .. tostring(p3) .. " for user " .. user .. " in " .. origin)
 		end
 
 		if LGC.db.profile.priorities[user] == nil then 	-- user does not exist

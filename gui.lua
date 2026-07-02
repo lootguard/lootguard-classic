@@ -13,6 +13,29 @@ function LGC:handleChatCommand(cmd)
 	elseif (cmd == "help") or (tempty(self.db.profile.priorities)) then
 		LGC:guiHelpFrame()
 
+	elseif cmd:match("test") or cmd:match("|Hitem:") then
+		local itemId = cmd:match("|Hitem:(%d+):")
+
+		if itemId then
+			LGC:Print("Testing item ID: " .. itemId)
+
+			local found = false
+			for user, prios in pairs(LGC.db.profile.priorities) do
+				for index = 1, 3 do
+					if prios[index] and tonumber(prios[index]) == tonumber(itemId) then
+						LGC:Print("Prio " .. index .. ": " .. user)
+						found = true
+					end
+				end
+			end
+
+			if not found then
+				LGC:Print("No priorities found for this item.")
+			end
+		else
+			LGC:Print("Usage: /lgc [ItemLink] - Shift-click an item to test priorities")
+		end
+
 	else
 		LGC:guiPriorityFrame()
 

@@ -238,6 +238,18 @@ L["There is a 'Versions' tab in the options, which is basically only there for d
 L["Users are notified if they have an older version of the application."] = "Benutzer werden informiert, wenn sie ein älteres Addon benutzen als andere Mitspieler."
 L["Until now, all addon synchronisation features were backwards compatible. If this changes at some point in time, a comprehensive error message will be put in place"] = "Bis jetzt sind alle Synchronisations-Features des Addons immer abwärtskompatibel. Wenn sich das einmal ändern sollte, wird das Addon mit einer aussagekräftigen Fehlermeldung darauf aufmerksam machen."
 
+-- Fehlende LootGuard Integration Strings
+L["Go to /lgc or /lootguard config, Import, Accept whispers"] = "Gehe zu /lgc oder /lootguard config, Import, Flüstern akzeptieren"
+L["You can verify who answered by /lgc or /lootguard"] = "Du kannst überprüfen, wer geantwortet hat mit /lgc oder /lootguard"
+L["Participants will need to have the LootGuard Classic addon to see current list."] = "Teilnehmer müssen das LootGuard Classic Addon haben, um die aktuelle Liste zu sehen."
+L["I really encourage you to use lootguard.de! The site supports both German and English."] = "Ich empfehle wirklich lootguard.de zu nutzen! Die Seite unterstützt sowohl Deutsch als auch Englisch."
+L["Go to lootguard.de and select 'Start Prio Run'."] = "Gehe zu lootguard.de und wähle 'Start Prio Run'."
+L["Set up the raid and select the bosses."] = "Richte den Raid ein und wähle die Bosse aus."
+L["Share the LootGuard.de PIN with your raid members."] = "Teile die LootGuard.de PIN mit deinen Raidmitgliedern."
+L["Each player should set their priorities."] = "Jeder Spieler sollte seine Prioritäten setzen."
+L["When all have entered, click on 'Open Prio' to view the list."] = "Wenn alle eingetragen haben, klicke auf 'Open Prio' um die Liste zu sehen."
+L["Use the 'Copy' button or 'Prio Export' to download the priorities."] = "Nutze den 'Copy' Button oder 'Prio Export' um die Prioritäten herunterzuladen."
+L["Copy & Paste the exported data into /lgc or /lootguard config, Import field"] = "Kopiere und füge die exportierten Daten in /lgc oder /lootguard config, Import Feld ein"
 
 -- load default outputs
 for k,v in pairs(LGC.outputLocales["deDE"]) do L[k] = v end
